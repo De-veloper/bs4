@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from fabric.api import *
 import os
+import json
 
 
 def fcount():
@@ -27,11 +28,22 @@ def searchPixelByClient():
     fin.close()
 
 def searchPixelByAllClients():
+    def _createJSON(obj, filename):
+	    with open('%s_pixels.json' %filename, 'w') as outfile:  
+		    json.dump(obj, outfile)
+    
+    data = {}
     textToSearch = raw_input("What pixel are you looking for?(ex:pixel_lib.FB) ")
     root, dirs, files = os.walk('C:/gitProjects/clients/').next()
     for c in dirs:
-        filepath = 'C:/gitProjects/clients/%s/pac7.2/script/pixels.js' % c 
-        if(os.path.exists(filepath)):
+        filepath = 'C:/gitProjects/clients/%s/pac7.2/script/pixels.js' % c
+        #if(os.path.exists(filepath)):
+        try:
+            if(os.path.exists(filepath)):
+                filepath = 'C:/gitProjects/clients/%s/pac7.2/script/pixels.js' % c
+            else:
+                filepath = 'C:/gitProjects/clients/%s/pac7.2/pixel/js/pixels.js' % c
+            
             cnt = 0
             with open(filepath) as fin:
                 for line in fin:
@@ -39,4 +51,17 @@ def searchPixelByAllClients():
                         cnt += 1
             if(cnt > 0):
                 print('%s - %s Pixel fires: %s' %(c, textToSearch,cnt) +' times')
+                data[c] = []
+                data[c].append({
+                    textToSearch:cnt
+                })
+                _createJSON(data,textToSearch)
+                #Todo: create a json file and show a GUI
+                #[
+                #    {'linkID':
+                #        {'FB':3,GA:1}
+                #    }
+                #]
             fin.close()
+        except:
+            print ('%s - file not found' % c)
