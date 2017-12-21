@@ -26,7 +26,7 @@ def searchPixelByClient():
                 cnt += 1
     print('%s - %s Pixel fires: %s' %(clientLinkID, textToSearch,cnt) +' times')
     fin.close()
-
+@task
 def searchPixelByAllClients():
     def _createJSON(obj, filename):
 	    with open('%s_pixels.json' %filename, 'w') as outfile:  
