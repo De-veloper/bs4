@@ -6,6 +6,9 @@ import json
 #import time
 #from sftpsync import Sftp
 
+# this module is included all server credentials and work path
+from config import *
+
 import pysftp
 
 # disable all warnings
@@ -57,7 +60,7 @@ def searchPixelByClient(clientLinkID):
         print ('%s - file not found' % clientLinkID)
 
 def createJSON(obj, filename):
-    with open('%s_pixels.json' %filename, 'w') as outfile:  
+    with open('json/%s_pixels.json' %filename, 'w') as outfile:  
         json.dump(obj, outfile)
 @task
 def searchPixel():
@@ -113,22 +116,21 @@ def searchPixelByClient2(clientLinkID):
     
         pixelName = raw_input("What pixel are you looking for?(ex:pixel_lib.FB) ")
         cnt = 0
-
+       
         with pysftp.Connection(host=ADMIN25_HOST, username=ADMIN25_USER, password=ADMIN25_PASSWD, cnopts=cnopts) as sftp:
-            print sftp.exists(filepath)
             if(sftp.exists(filepath)):
                 with sftp.open(filepath) as fin:
                     for line in fin:
                         if pixelName in line:
                            cnt += 1
         print('%s - %s Pixel fires: %s' %(clientLinkID, pixelName,cnt) +' times')
-        #if(cnt>0):
-        #    data = []
-        #    data.append({
-        #        pixelName:cnt
-        #    })
-        #    fileName = '%s_%s' %(clientLinkID, pixelName)
-        #    createJSON(data,fileName)
+        if(cnt>0):
+            data = []
+            data.append({
+                pixelName:cnt
+            })
+            fileName = '%s_%s' %(clientLinkID, pixelName)
+            createJSON(data,fileName)
         fin.close()
     except:
         print ('%s - file not found' % clientLinkID)
